@@ -1,0 +1,234 @@
+/* Widget colors follow the Quarto (Bootstrap) theme, so they switch with light/dark automatically.
+   The other --splat-* settings are described at the top of widgets/splat-widgets.js. */
+:root {
+  --splat-text: var(--bs-body-color);
+  --splat-muted: var(--bs-secondary-color);
+  --splat-accent: var(--bs-link-color);
+  --splat-border: var(--bs-border-color);
+  --splat-aspect: 16 / 10;
+  --splat-aspect-narrow: 1 / 1;
+  --splat-radius: 14px;
+  --splat-stage-bg: #121316;   /* the 3D background; dark in both themes, like a video */
+}
+
+/* Light/dark button: Quarto's own toggle (top right), restyled as a round button with a moon (in light mode,
+   "switch to dark") or a sun (in dark mode, "switch to light"). 44px so it's easy to tap on a phone.
+   Icon shapes follow Lucide's moon and sun (ISC license). */
+.quarto-color-scheme-toggle.top-right {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1030;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--bs-border-color);
+  background-color: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.2s, transform 0.25s ease, opacity 0.25s ease;
+}
+/* Wide screens (768px and up, where Quarto shows the "On this page" list): widgets/head.html moves the button
+   to the top of that column. Its top lines up with the title's top (the column has 14px padding from 992px and
+   none below, while the title starts 30px and 16px down, so 16px works for both), and the list starts an even
+   gap below it. The column is sticky; making it stick 75px higher than Quarto does lets the button scroll away
+   with the title, while the list slides up into the space it leaves and sticks where it normally would.
+   (!important because Quarto's script writes top and max-height straight onto the column.) */
+#quarto-margin-sidebar > .quarto-color-scheme-toggle.top-right {
+  position: static;
+  display: flex;
+  margin: 16px 0 20px;
+}
+#quarto-margin-sidebar:has(> .quarto-color-scheme-toggle) {
+  top: -75px !important;
+  max-height: calc(100vh + 75px) !important;
+}
+/* Narrow screens (no side list): the button floats in the top-right corner, 20px in from both edges. Once the page
+   has moved under it, a soft shadow lifts it off the content (.floating). After the title area has scrolled away,
+   it slides away while the reader scrolls down and comes back when they scroll up (.scrolled-away); while the
+   title is still on screen it stays put. Both classes are set by widgets/head.html. It stays put while it has
+   keyboard focus. Reduced motion: it appears and disappears without sliding. */
+.quarto-color-scheme-toggle.top-right.floating { box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12); }
+body.quarto-dark .quarto-color-scheme-toggle.top-right.floating { box-shadow: 0 2px 12px rgba(0, 0, 0, 0.5); }
+.quarto-color-scheme-toggle.top-right.scrolled-away:not(:focus-visible) {
+  transform: translateY(-80px);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quarto-color-scheme-toggle.top-right { transition: background-color 0.15s, border-color 0.15s, box-shadow 0.2s; }
+}
+/* Hover tint mixed from the theme's own colors, so it suits light and dark. Mouse only: on touch screens
+   a hover look would stay stuck after a tap. */
+@media (hover: hover) {
+  .quarto-color-scheme-toggle.top-right:hover { background-color: color-mix(in srgb, var(--bs-body-color) 10%, var(--bs-body-bg)); }
+}
+.quarto-color-scheme-toggle.top-right:focus-visible { outline: 2px solid var(--bs-link-color); outline-offset: 2px; }
+.quarto-color-scheme-toggle.top-right .bi::before {
+  width: 20px;
+  height: 20px;
+  background-image: none !important;
+  background-color: currentColor;
+  -webkit-mask: var(--color-scheme-icon) center / contain no-repeat;
+  mask: var(--color-scheme-icon) center / contain no-repeat;
+}
+.quarto-color-scheme-toggle.top-right {
+  --color-scheme-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>');
+}
+.quarto-color-scheme-toggle.top-right.alternate {
+  --color-scheme-icon: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>');
+}
+/* Keep a long title from running under the button on narrow screens. */
+@media (max-width: 767.98px) {
+  #title-block-header .title { padding-right: 56px; }
+}
+
+/* Input images diagram: a fanned stack of photo prints (the last <img> is the top, middle card), a caption,
+   then an arrow down into the world widget. Sizes follow the column width, so it shrinks on phones.
+   --shift is in card widths (translateX percentages use the card's own width). */
+.input-stack { margin: 1.5rem 0 0; text-align: center; }
+.input-stack-photos {
+  position: relative;
+  width: min(100%, 560px);
+  aspect-ratio: 560 / 245;
+  margin: 0 auto;
+}
+.input-stack-photos img {
+  position: absolute;
+  left: 50%;
+  top: var(--drop);
+  width: 52%;
+  max-width: none;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+  transform: translateX(-50%) translateX(var(--shift)) rotate(var(--turn));
+}
+.input-stack-photos img:nth-child(1) { --shift: -46%; --turn: -10deg; --drop: 22%; }
+.input-stack-photos img:nth-child(2) { --shift: -24%; --turn: -5deg;  --drop: 14%; }
+.input-stack-photos img:nth-child(3) { --shift: 24%;  --turn: 5deg;   --drop: 14%; }
+.input-stack-photos img:nth-child(4) { --shift: 46%;  --turn: 10deg;  --drop: 22%; }
+.input-stack-photos img:nth-child(5) { --shift: 0%;   --turn: 0deg;   --drop: 5%; width: 56%; }
+.input-stack-photos img:nth-child(1), .input-stack-photos img:nth-child(4) { z-index: 1; }
+.input-stack-photos img:nth-child(2), .input-stack-photos img:nth-child(3) { z-index: 2; }
+.input-stack-photos img:nth-child(5) { z-index: 3; }
+@media (max-width: 575.98px) {
+  .input-stack-photos img { border-width: 2px; border-radius: 3px; }
+}
+body.quarto-dark .input-stack-photos img { border-color: #e9ecef; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); }
+/* Caption, arrow and label: edit their text freely in intro-to-world-models-n-robot-grandmas-blog.qmd; everything stays centered.
+   The arrow row has three columns (equal space | arrow | equal space), so the arrow sits exactly in the
+   middle and the label just to its right, whatever the label's length. */
+.input-stack-caption { margin-top: 0.35rem; font-size: 0.9rem; color: var(--bs-secondary-color); text-align: center; }
+.input-stack-arrow {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  column-gap: 0.5rem;
+  margin: 0.25rem 0 0.25rem;
+  color: var(--bs-secondary-color);
+}
+.input-stack-arrow svg { grid-column: 2; display: block; }
+.input-stack-arrow span { grid-column: 3; justify-self: start; text-align: left; font-size: 0.9rem; font-weight: 600; color: var(--bs-body-color); }
+/* The world widget right after the diagram sits close under the arrow. */
+.input-stack + marble-world-demo { margin-top: 0.25rem; }
+
+/* Space around each widget, like a figure. */
+splat-blob-demo, splat-object-demo, marble-world-demo, marble-mesh-compare, robot-grandma-demo {
+  display: block;
+  margin: 1rem 0 1.75rem;
+}
+
+/* End matter (Credits & Acknowledgements, References, Footnotes): Quarto's appendix, restyled as a tinted,
+   rounded panel under the post, so the essay's end is obvious. The tint is mixed from the theme's own text and
+   background colors (a shade darker in light mode, a shade lighter in dark mode) and the corners match the
+   widget panels. Headings become small uppercase labels; lists get muted bullets; links read as text with a
+   tinted underline and take the link color on hover. Quarto dims the whole appendix with opacity; that is turned
+   off and the muted color set directly instead, which keeps the contrast readable in dark mode. */
+#quarto-appendix.default {
+  margin-top: 3.5rem;
+  padding: 2rem 2.25rem;
+  border: 1px solid color-mix(in srgb, var(--bs-border-color) 60%, transparent);
+  border-radius: var(--splat-radius);
+  background-color: color-mix(in srgb, var(--bs-body-color) 4%, var(--bs-body-bg));
+}
+@media (max-width: 575.98px) {
+  #quarto-appendix.default { padding: 1.5rem 1.25rem; }
+}
+#quarto-appendix.default section { padding-bottom: 1.25rem; }
+#quarto-appendix.default section:last-child,
+#quarto-appendix.default section:has(+ section[hidden]) { padding-bottom: 0; }
+/* A footnote's ¹ can jump to its Credits line (widgets/head.html); briefly tint that line so the eye finds it. */
+#quarto-appendix.default :target {
+  border-radius: 4px;
+  animation: credit-target-flash 2s ease-out;
+}
+@keyframes credit-target-flash {
+  from { background-color: color-mix(in srgb, var(--bs-link-color) 22%, transparent); }
+  to { background-color: transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #quarto-appendix.default :target { animation: none; }
+}
+/* An end-panel section whose heading isn't shown (intro-to-world-models-n-robot-grandmas-blog.qmd: {.appendix .heading-hidden}), e.g. the thank-you
+   lines at the top of the panel. The heading stays in the page for screen readers, just not on screen. */
+#quarto-appendix.default section.heading-hidden > .quarto-appendix-heading {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+#quarto-appendix.default section > *:not(a),
+#quarto-appendix.default section *[role=doc-endnotes] { opacity: 1; }
+#quarto-appendix.default .quarto-appendix-heading {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem !important;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--bs-body-color);
+  opacity: 1;
+}
+#quarto-appendix.default .quarto-appendix-contents > *:not(h2),
+#quarto-appendix.default *[role=doc-endnotes] > ol {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--bs-body-color);
+}
+#quarto-appendix.default .quarto-appendix-contents > p { margin-bottom: 0.5rem; }
+#quarto-appendix.default .quarto-appendix-contents > p + ul { margin-top: 1rem; }
+/* Lists keep small, muted bullets with a hanging indent: a wrapped entry's second line lines up with its text,
+   not under the bullet. */
+#quarto-appendix.default .quarto-appendix-contents > ul {
+  padding-left: 1.1rem;
+  margin-bottom: 0;
+}
+#quarto-appendix.default .quarto-appendix-contents > ul > li { margin-bottom: 0.4rem; padding-left: 0.2rem; line-height: 1.5; }
+#quarto-appendix.default .quarto-appendix-contents > ul > li::marker { color: var(--bs-secondary-color); }
+#quarto-appendix.default .quarto-appendix-contents > ul > li:last-child { margin-bottom: 0; }
+#quarto-appendix.default a:not(.footnote-back) {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, var(--bs-link-color) 55%, transparent);
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+#quarto-appendix.default a:not(.footnote-back):hover {
+  color: var(--bs-link-color);
+  text-decoration-color: currentColor;
+}
+#quarto-appendix.default a:focus-visible { outline: 2px solid var(--bs-link-color); outline-offset: 2px; border-radius: 2px; }
+#quarto-appendix.default .footnotes ol { margin-left: 0; padding-left: 1.25em; }
+#quarto-appendix.default .footnotes ol li::marker { color: var(--bs-secondary-color); }
+#quarto-appendix.default .footnote-back { color: var(--bs-secondary-color); text-decoration: none; }

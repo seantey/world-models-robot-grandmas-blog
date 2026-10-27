@@ -1,0 +1,8 @@
+.DS_Store
+# The large files live on the asset host, never in this repository.
+*.spz
+*.glb
+*.wasm
+*.bin
+*.ply
+*.rad
